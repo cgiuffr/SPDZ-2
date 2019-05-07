@@ -3,6 +3,10 @@
 
 include CONFIG
 
+# For mpir
+CFLAGS += -I./local/include
+LDLIBS += -Wl,-rpath -Wl,./local/lib -L./local/lib
+
 MATH = $(patsubst %.cpp,%.o,$(wildcard Math/*.cpp))
 
 TOOLS = $(patsubst %.cpp,%.o,$(wildcard Tools/*.cpp))
@@ -34,7 +38,7 @@ OBJS = $(COMPLETE)
 DEPS := $(OBJS:.o=.d)
 
 
-all: gen_input online offline externalIO
+all: mpir-build gen_input online offline externalIO
 
 ifeq ($(USE_NTL),1)
 all: overdrive she-offline
@@ -115,5 +119,17 @@ spdz2-offline.x: $(COMMON) $(FHEOFFLINE) spdz2-offline.cpp
 	$(CXX) $(CFLAGS) -o $@ $^ $(LDLIBS)
 endif
 
+.PHONY: mpir-build
+mpir/configure:
+	git submodule update --init mpir
+	cd mpir; \
+	autoreconf -i; \
+	autoreconf -i
+	- $(MAKE) -C mpir clean
+	CFLAGS="$(MPIR_CFLAGS)" ./configure --enable-cxx --prefix=$(CURDIR)/local
+
+mpir-build: mpir/configure
+	$(MAKE) -C mpir install
+
 clean:
-	-rm */*.o *.o */*.d *.d *.x core.* *.a gmon.out
+	-rm */*.o *.o */*.d *.d *.x core.* *.a gmon.out */*/*.o static/*.x

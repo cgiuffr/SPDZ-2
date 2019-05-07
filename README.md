@@ -25,7 +25,11 @@ In particular, the online phase will discard preprocessed data and crash when it
  - CPU supporting AES-NI and PCLMUL
  - Python 2.x, ideally with `gmpy` package (for testing)
  - NTL library for the SPDZ-2 and Overdrive offline phases (optional; tested with NTL 9.10)
+ - valgrind (tested with 3.13.0)
  - If using macOS, Sierra or later
+
+On Ubuntu, the following should do:
+`sudo apt-get install build-essential python libsodium-dev libntl-dev valgrind`
 
 #### To compile SPDZ:
 
@@ -36,6 +40,8 @@ In particular, the online phase will discard preprocessed data and crash when it
  - For the SPDZ-2 and Overdrive offline phases, set `USE_NTL = 1` and `MOD = -DMAX_MOD_SZ=6`.
  - For the MASCOT offline phase or to use GF(2^128) in the online phase, set `USE_GF2N_LONG = 1`.
  - For processors without AVX (e.g., Intel Atom) or for optimization, set `ARCH = -march=<architecture>`.
+
+Or simply cp `CONFIG.mine.default` `CONFIG.mine`
 
 2) Run make (use the flag -j for faster compilation multiple threads). Remember to run `make clean` first after changing `CONFIG` or `CONFIG.mine`.
 
